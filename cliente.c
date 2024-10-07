@@ -48,7 +48,7 @@ main(int argc, char *argv[])
 {
     struct sockaddr_in sock_in;
     int                sockfd;
-    int                n;
+    ssize_t            n;
     char               buff[MAXBUFFLEN];
 
     if (argc != 3)
@@ -71,9 +71,14 @@ main(int argc, char *argv[])
      * Devuelve 0 si no hay error o < 0 si hay error */
     assert_get0(connect(sockfd, (struct sockaddr *) &sock_in, sizeof(struct sockaddr_in)));
 
+    /* duerme 2 segundos para que el servidor pueda
+     * enviar dos mensajes. (Parte 2 practica) */
+    // sleep(2);
+
     while (1)
     {
-        n = recv(sockfd, buff, MAXBUFFLEN, 0);
+        // n = recv(sockfd, buff, MAXBUFFLEN, 0);
+        while ((n = recv(sockfd, buff, MAXBUFFLEN, 0)) > 0)
         {
             if (n < 0)
             {
@@ -88,7 +93,8 @@ main(int argc, char *argv[])
             }
 
             printf("%s", buff);
-        break; // salir del programa al recivir el mensaje
+            printf(" (%zd bytes recibidos)\n", n); // zd es para ssize_t
+
         }
     }
     close(sockfd);
